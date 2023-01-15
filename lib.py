@@ -69,6 +69,7 @@ def js_activator(driver, k=3):
 
 def net_check():
     import requests
+    init(autoreset=True)
     try:
         requests.get('https://www.baidu.com')
         print(Fore.LIGHTGREEN_EX +'network connected')
