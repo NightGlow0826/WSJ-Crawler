@@ -1,5 +1,8 @@
 # 使用selenium爬取wsj
 
+## 说明
+这是构建 NLP&Finance 的语料库爬虫，目前日更可利用 crawle_main 获取
+
 ## 步骤
 先把拓展的文件夹在浏览器开发者模式里打包成crx
 
