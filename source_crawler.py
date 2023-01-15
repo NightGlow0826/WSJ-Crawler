@@ -15,7 +15,7 @@ from lib import mkdir, cover_name, js_activator
 
 driver_path = lib.driver_path
 ex_path = lib.ex_path
-proxies = lib.proxies
+# proxies = lib.proxies
 
 # 爬取整体页面源码
 name = Namer()
