@@ -50,6 +50,9 @@ class Crawler(object):
         print('market html successfully written')
         return True
 
+    def quit(self):
+        self.driver.quit()
+
 if __name__ == '__main__':
 
     lib.net_check()
@@ -58,5 +61,5 @@ if __name__ == '__main__':
     crawler = Crawler(driver)
     crawler.cover()
     crawler.market()
-    driver.quit()
+    crawler.quit()
 
