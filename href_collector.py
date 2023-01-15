@@ -29,13 +29,15 @@ class Href_Collecter(object):
             soup = BeautifulSoup(f, 'html.parser')
         # soup = BeautifulSoup()
         a = soup.find_all('article')
-        pattern = re.compile('(https://.*?)"')
+        # sep_print(a)
+        pattern = re.compile('"(http[s]*://.*?)"')
         hrefs = []
         lead_poses = []
 
         for article in a:
             cr = article.find_all_next('a', href=True)[0]
             cr = str(cr)
+            # print(cr)
             hrefs.append(re.findall(pattern, cr)[0].replace('"', ''))
 
         for item in hrefs:
@@ -46,6 +48,7 @@ class Href_Collecter(object):
 
 
 if __name__ == '__main__':
-
+    name = Namer()
     hc = Href_Collecter()
-    sep_print(hc.lead_pos_href_list(file_name='source/cover/html/2023_1_14_cover.html'))
+    # hc.lead_pos_href_list(file_name=name.market_name())
+    sep_print(hc.lead_pos_href_list(file_name=name.market_name()))
