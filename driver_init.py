@@ -43,6 +43,9 @@ class Driver(object):
             "webrtc.nonproxied_udp_enabled": False
         }
         self.browser_option.add_experimental_option("prefs", preferences)
+
+        prefs = {'profile.managed_default_content_settings.images': 2}
+        self.browser_option.add_experimental_option('prefs', prefs)
         driver = webdriver.Edge(service=Service(driver_path),
                                 options=self.browser_option,
                                 )
