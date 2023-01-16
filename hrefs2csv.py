@@ -28,10 +28,19 @@ def list2df(href_list, df, driver):
         #     f.write(driver.page_source)
 
         parser = parser_choser(essay_type(href_list[i]), soup)
-        title, brief, write_time, content, href = parser.title(), parser.brief(), parser.write_time(), parser.content(), \
-                                                  href_list[i]
+        try:
+            title, brief, write_time, content, href = parser.title(), parser.brief(), parser.write_time(), parser.content(), \
+                                                      href_list[i]
+            df.loc[i] = [write_time, title, brief, content, href]
+
+        except Exception:
+            print('strange article form')
+            title, brief, write_time, content, href = '', '', '', '', \
+                                                      href_list[i]
+            df.loc[i] = [write_time, title, brief, content, href]
+
+            continue
         # sep_print(content)
-        df.loc[i] = [write_time, title, brief, content, href]
 
         time.sleep(0.5)
 
@@ -39,8 +48,9 @@ def list2df(href_list, df, driver):
 
 
 class Extractor(object):
-    def __init__(self, driver):
+    def __init__(self, driver, namer=Namer()):
         self.driver = driver
+        self.namer = namer
 
     def cover(self, href_list, name: str = None):
         df = pd.DataFrame({
@@ -50,9 +60,9 @@ class Extractor(object):
             "content": [],
             "href": []
         })
-        df = list2df(href_list, df, self.driver)
         if not name:
-            name = namer.cover_name(f_type='csv')
+            name = self.namer.cover_name(f_type='csv')
+        df = list2df(href_list, df, self.driver)
         df.to_csv(name, sep=',', index=True, header=True)
 
         return True
@@ -68,7 +78,7 @@ class Extractor(object):
         df = list2df(href_list, df, self.driver)
 
         if not name:
-            name = namer.market_name(f_type='csv')
+            name = self.namer.market_name(f_type='csv')
         df.to_csv(name, sep=',', index=True, header=True)
         return True
 
@@ -85,4 +95,3 @@ if __name__ == '__main__':
     ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
     ex.quit()
-
