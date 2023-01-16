@@ -95,6 +95,7 @@ class LivecoverageParser(ArticleParser):
     def __init__(self, soup):
         ArticleParser.__init__(self, soup)
         self.soup = soup
+
     def content(self):
         content = []
         body = str(self.soup)
@@ -110,6 +111,7 @@ class LivecoverageParser(ArticleParser):
     def write_time(self):
         return ''
 
+
 def parser_choser(type, soup):
     if type == 'articles':
         parser = ArticleParser(soup)
@@ -122,7 +124,8 @@ def parser_choser(type, soup):
 
 if __name__ == '__main__':
     driver = Driver(driver_path=lib.driver_path, extension_path=lib.ex_path).blank_driver()
-    driver.get('https://www.wsj.com/articles/jpmorgan-gets-a-lift-from-interest-rates-but-warns-of-mild-recession-11673612918?mod=hp_lead_pos1')
+    driver.get(
+        'https://www.wsj.com/articles/jpmorgan-gets-a-lift-from-interest-rates-but-warns-of-mild-recession-11673612918?mod=hp_lead_pos1')
     lib.js_activator(driver)
     ps = driver.page_source
     # with open('6.html', 'w', encoding='utf-8') as f:
@@ -130,16 +133,14 @@ if __name__ == '__main__':
 
     # with open('6.html', 'r', encoding='utf-8') as f:
     #     soup = BeautifulSoup(f, 'html.parser')
-        # content(soup)
-        # parser = ArticleParser(soup)
-        # print(parser.title())
-        # print(parser.brief())
-        # print(parser.write_time())
-        # parser.content()
-        # sep_print(parser.content())
+    # content(soup)
+    # parser = ArticleParser(soup)
+    # print(parser.title())
+    # print(parser.brief())
+    # print(parser.write_time())
+    # parser.content()
+    # sep_print(parser.content())
 
     soup = BeautifulSoup(ps, 'html.parser')
     parser = ArticleParser(soup)
     sep_print(parser.content())
-
-
