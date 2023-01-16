@@ -36,7 +36,7 @@ class Crawler(object):
         # 现在是页面的源码了！
 
         with open(name.cover_name(), 'w+', encoding='utf-8') as f:
-            f.write(driver.page_source)
+            f.write(self.driver.page_source)
         print('cover html successfully written')
         return True
 
@@ -46,7 +46,7 @@ class Crawler(object):
         js_activator(driver=self.driver)
 
         with open(name.market_name(), 'w+', encoding='utf-8') as f:
-            f.write(driver.page_source)
+            f.write(self.driver.page_source)
         print('market html successfully written')
         return True
 
