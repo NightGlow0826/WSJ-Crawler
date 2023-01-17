@@ -108,6 +108,6 @@ if __name__ == '__main__':
     namer = Namer()
     driver = Driver(extension_path=lib.ex_path).blank_driver()
     ex = Extractor(driver)
-    # ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
+    ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
     # ex.quit()
