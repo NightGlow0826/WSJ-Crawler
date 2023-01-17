@@ -12,6 +12,8 @@ from fake_useragent import UserAgent
 ua = UserAgent()
 driver_path = lib.driver_path
 ex_path = lib.ex_path
+
+
 # proxies = lib.proxies
 
 
@@ -23,7 +25,8 @@ class Driver(object):
         self.proxies = proxies
         if not extension_path:
             print('Warning: extension path is empty. Could not bypass the paywall')
-    def blank_driver(self):
+
+    def blank_driver(self, mute=False):
         # 初始化selenium driver
         self.browser_option = webdriver.EdgeOptions()
         self.browser_option.add_experimental_option('excludeSwitches', ['enable-automation'])
@@ -49,8 +52,8 @@ class Driver(object):
         driver = webdriver.Edge(service=Service(driver_path),
                                 options=self.browser_option,
                                 )
-
-        print('driver initialized')
+        if not mute:
+            print('driver initialized')
         return driver
 
 #
