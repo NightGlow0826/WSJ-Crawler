@@ -14,7 +14,7 @@ from driver_init import Driver
 from namer import Namer
 from source_crawler import Crawler
 from hrefs2csv import Extractor
-
+from threading import Thread
 
 def main():
     hc = Href_Collecter()
@@ -24,18 +24,18 @@ def main():
     lib.net_check()
 
     # 爬取封面
-    driver = Driver(driver_path=driver_path, extension_path=ex_path).blank_driver()
-    crawler = Crawler(driver)
-    crawler.cover()
-    crawler.market()
-    crawler.quit()
+    crawler = Crawler()
+    th_cover, th_market = Thread(target=crawler.cover), Thread(target=crawler.market)
+
+    th_cover.start(), th_market.start()
+    th_cover.join(), th_market.join()
+
 
     # 分条爬取
     driver = Driver(extension_path=lib.ex_path).blank_driver()
     ex = Extractor(driver)
     ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
-    ex.quit()
 
 
 if __name__ == '__main__':

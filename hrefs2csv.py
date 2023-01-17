@@ -64,8 +64,7 @@ def list2df(href_list, df, ):
 
 
 class Extractor(object):
-    def __init__(self, driver, namer=Namer()):
-        self.driver = driver
+    def __init__(self, namer=Namer()):
         self.namer = namer
 
     def cover(self, href_list, name: str = None):
@@ -98,16 +97,14 @@ class Extractor(object):
         df.to_csv(name, sep=',', index=True, header=True)
         return True
 
-    def quit(self):
-        self.driver.quit()
+
 
 
 if __name__ == '__main__':
     hc = Href_Collecter()
     lib.net_check()
     namer = Namer()
-    driver = Driver(extension_path=lib.ex_path).blank_driver()
-    ex = Extractor(driver)
+    ex = Extractor()
     ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
     # ex.quit()
