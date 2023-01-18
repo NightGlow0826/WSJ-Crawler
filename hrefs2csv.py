@@ -44,7 +44,7 @@ def list2df(href_list, df, ):
             title, brief, write_time, content, href = '', '', '', '', \
                                                       href_list[i]
             df.loc[i] = [write_time, title, brief, content, href]
-        # driver.quit()
+        driver.quit()
 
         print("Thread {} done".format((i+1)))
         # sep_print(content)

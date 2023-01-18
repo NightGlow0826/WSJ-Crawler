@@ -11,10 +11,10 @@ import lib
 from driver_init import Driver
 import datetime
 from namer import Namer
-from lib import mkdir, cover_name, js_activator
-
+from lib import mkdir, cover_name, js_activator, ex_path
+from threading import Thread
 driver_path = lib.driver_path
-ex_path = lib.ex_path
+# ex_path = lib.ex_path
 # proxies = lib.proxies
 
 # 爬取整体页面源码
@@ -39,6 +39,7 @@ class Crawler(object):
         with open(name.cover_name(), 'w+', encoding='utf-8') as f:
             f.write(driver.page_source)
         print('cover html successfully written')
+        driver.quit()
         return True
 
     def market(self):
@@ -50,13 +51,16 @@ class Crawler(object):
         with open(name.market_name(), 'w+', encoding='utf-8') as f:
             f.write(driver.page_source)
         print('market html successfully written')
+        driver.quit()
+
         return True
 
 
 if __name__ == '__main__':
     lib.net_check()
 
-    driver = Driver(driver_path=driver_path, extension_path=ex_path).blank_driver()
     crawler = Crawler()
-    crawler.cover()
-    crawler.market()
+    th_cover, th_market = Thread(target=crawler.cover), Thread(target=crawler.market)
+
+    th_cover.start(), th_market.start()
+    th_cover.join(), th_market.join()
