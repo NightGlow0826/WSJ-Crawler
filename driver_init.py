@@ -57,10 +57,11 @@ class Driver(object):
         return driver
 
 #
-# if __name__ == '__main__':
-#     driver = Driver(driver_path).blank_driver()
+if __name__ == '__main__':
+    driver = Driver(extension_path=ex_path).blank_driver()
 #
-#     driver.get('https://browserleaks.com/ip')
+    driver.get('https://browserleaks.com/ip')
+
 #     # driver.get('http://httpbin.org/ip')
 #     # driver.get('http://www.google.com')
 #     print(driver.page_source)
