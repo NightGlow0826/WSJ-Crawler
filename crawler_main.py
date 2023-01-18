@@ -32,8 +32,7 @@ def main():
 
 
     # 分条爬取
-    driver = Driver(extension_path=lib.ex_path).blank_driver()
-    ex = Extractor(driver)
+    ex = Extractor()
     ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
 
