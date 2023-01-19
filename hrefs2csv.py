@@ -24,6 +24,8 @@ def list2df(href_list, df, ):
         print('progress: {} of {}'.format(i + 1, len(href_list)), end='\t')
         print(href_list[i])
         driver = Driver(extension_path=ex_path).blank_driver(mute=True)
+        driver.minimize_window()
+
         driver.get(href_list[i])
         js_activator(driver)
         soup = BeautifulSoup(driver.page_source, 'html.parser')

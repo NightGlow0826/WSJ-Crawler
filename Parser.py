@@ -125,7 +125,7 @@ def parser_choser(type, soup):
 if __name__ == '__main__':
     driver = Driver(driver_path=lib.driver_path, extension_path=lib.ex_path).blank_driver()
     driver.get(
-        'https://www.wsj.com/articles/jpmorgan-gets-a-lift-from-interest-rates-but-warns-of-mild-recession-11673612918?mod=hp_lead_pos1')
+        'https://www.wsj.com/articles/the-disney-executive-who-made-119-505-a-day-11674045194?mod=hp_lead_pos9')
     lib.js_activator(driver)
     ps = driver.page_source
     # with open('6.html', 'w', encoding='utf-8') as f:

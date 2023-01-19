@@ -29,6 +29,8 @@ class Crawler(object):
         driver = Driver(extension_path=ex_path).blank_driver(mute=True)
         print('crawling cover_page')
         # 爬取封面源码
+        driver.minimize_window()
+
         driver.get('http://www.wsj.com')
 
         # 刷新js
@@ -45,6 +47,8 @@ class Crawler(object):
     def market(self):
         driver = Driver(extension_path=ex_path).blank_driver(mute=True)
         print('crawling market_page')
+        driver.minimize_window()
+
         driver.get('https://www.wsj.com/news/markets?mod=nav_top_section')
         js_activator(driver=driver)
 

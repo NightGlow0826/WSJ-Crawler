@@ -55,7 +55,7 @@ def cover_name():
     return daily_coversourse_filename
 
 
-def js_activator(driver, k=3):
+def js_activator(driver, k=40):
     content_0 = driver.page_source
     for i in range(k):
         driver.execute_script('window.scrollTo(0, document.body.scrollHeight/10)')
@@ -63,8 +63,8 @@ def js_activator(driver, k=3):
         if driver.page_source != content_0:
             break
 
-    assert content_0 != driver.page_source
     print('js activated, scrolled {} time(s)'.format(i+1))
+    assert content_0 != driver.page_source
     time.sleep(0.5)
 
 def net_check():

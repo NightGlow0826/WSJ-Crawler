@@ -8,6 +8,7 @@ import requests
 import datetime
 import lib
 from fake_useragent import UserAgent
+from pyvirtualdisplay import Display
 
 ua = UserAgent()
 driver_path = lib.driver_path
@@ -30,11 +31,13 @@ class Driver(object):
         # 初始化selenium driver
         self.browser_option = webdriver.EdgeOptions()
         self.browser_option.add_experimental_option('excludeSwitches', ['enable-automation'])
+        self.browser_option.add_experimental_option('excludeSwitches', ['ignore-certificate-errors'])
 
-        self.browser_option.add_argument('--headless=chrome')
+
         self.browser_option.add_argument('--disable-gpu')
         self.browser_option.add_argument('--user-agent=' + ua.random)
         self.browser_option.add_experimental_option("detach", True)
+        self.browser_option.add_experimental_option("useAutomationExtension", False)
         if self.ex_path:
             self.browser_option.add_extension(self.ex_path)
         if self.proxies:
@@ -43,24 +46,33 @@ class Driver(object):
         preferences = {
             "webrtc.ip_handling_policy": "disable_non_proxied_udp",
             "webrtc.multiple_routes_enabled": False,
-            "webrtc.nonproxied_udp_enabled": False
+            "webrtc.nonproxied_udp_enabled": False,
+            "credentials_enable_service": False,
+            "profile.password_manager_enabled": False
         }
         self.browser_option.add_experimental_option("prefs", preferences)
 
-        prefs = {'profile.managed_default_content_settings.images': 2}
+        prefs = {'profile.managed_default_content_settings.images': 2,
+                 }
         self.browser_option.add_experimental_option('prefs', prefs)
+
+        # self.browser_option.add_argument('--headless=chrome')
         driver = webdriver.Edge(service=Service(driver_path),
                                 options=self.browser_option,
                                 )
+
         if not mute:
             print('driver initialized')
+
+
         return driver
+
 
 #
 if __name__ == '__main__':
     driver = Driver(extension_path=ex_path).blank_driver()
-#
-    driver.get('https://browserleaks.com/ip')
+    # driver.get('https://browserleaks.com/ip')
+    driver.get('https://www.wsj.com/articles/the-disney-executive-who-made-119-505-a-day-11674045194?mod=hp_lead_pos9')
 
 #     # driver.get('http://httpbin.org/ip')
 #     # driver.get('http://www.google.com')
