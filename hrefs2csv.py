@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 from threading import Thread
 
 
-def list2df(href_list, df, ):
+def list2df(href_list, df, retry=3):
     # want to try the muti-thread
     def func(i, df=df, ):
         print('progress: {} of {}'.format(i + 1, len(href_list)), end='\t')
@@ -28,24 +28,28 @@ def list2df(href_list, df, ):
 
         driver.get(href_list[i])
         js_activator(driver)
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        for r in range(retry):
+            time.sleep(2)
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        # with open('1.html', 'w+', encoding='utf-8') as f:
-        #     f.write(driver.page_source)
+            # with open('1.html', 'w+', encoding='utf-8') as f:
+            #     f.write(driver.page_source)
 
-        parser = parser_choser(essay_type(href_list[i]), soup)
-        try:
-            title, brief, write_time, content, href = parser.title(), parser.brief(), parser.write_time(), parser.content(), \
-                                                      href_list[i]
-            df.loc[i] = [write_time, title, brief, content, href]
-            # print('Thread {} strange article form'.format(i+1))
+            parser = parser_choser(essay_type(driver.current_url), soup)
+            try:
+                title, brief, write_time, content, href = parser.title(), parser.brief(), parser.write_time(), parser.content(), \
+                                                          href_list[i]
+                df.loc[i] = [write_time, title, brief, content, href]
+                # print('Thread {} strange article form'.format(i+1))
+                break
 
-
-        except Exception:
-            print('Thread {} strange article form'.format(i+1))
-            title, brief, write_time, content, href = '', '', '', '', \
-                                                      href_list[i]
-            df.loc[i] = [write_time, title, brief, content, href]
+            except Exception:
+                if r < retry - 1:
+                    continue
+                print('Thread {} strange article form'.format(i+1))
+                title, brief, write_time, content, href = '', '', '', '', \
+                                                          href_list[i]
+                df.loc[i] = [write_time, title, brief, content, href]
         driver.quit()
 
         print("Thread {} done".format((i+1)))
@@ -79,7 +83,7 @@ class Extractor(object):
         })
         if not name:
             name = self.namer.cover_name(f_type='csv')
-        df = list2df(href_list, df, )
+        df = list2df(href_list, df, retry=3)
         df.to_csv(name, sep=',', index=True, header=True)
 
         return True
@@ -107,6 +111,6 @@ if __name__ == '__main__':
     lib.net_check()
     namer = Namer()
     ex = Extractor()
-    ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
+    # ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
     ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
     # ex.quit()
