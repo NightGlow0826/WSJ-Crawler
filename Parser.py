@@ -13,6 +13,7 @@ from wsj_selenium_crawler import lib
 from source_crawler import cover_name
 from lib import sep_print
 from driver_init import Driver
+import dateutil.parser
 
 
 def ab_char_sub(a: str):
@@ -102,7 +103,7 @@ class LivecoverageParser(ArticleParser):
         paras = re.findall(r'<p>(.*?)</p>', body)[:-2]
         lis = re.findall(r'<li>(.*?)</li>', body)
         paras.extend(lis)
-        for p in paras:
+        for p in paras[:len(paras) - 1]:
             p = ab_char_sub(p)
             content.append(p)
 
@@ -112,35 +113,76 @@ class LivecoverageParser(ArticleParser):
         return ''
 
 
+class AMPParser(ArticleParser):
+    def __init__(self, soup):
+        ArticleParser.__init__(self, soup)
+        self.strsoup = str(soup)
+        self.soup = soup
+
+    def title(self):
+        h1_ = re.findall(r'<h1.*?>(.*?)</h1>', self.strsoup)[0]
+        return h1_
+
+    def brief(self):
+        h2_ = re.findall(r'<h2.*?>(.*?)</h2>', self.strsoup)[0]
+        return h2_
+
+    def content(self):
+        content = []
+        body = self.soup.find_all('section')
+        body_ = str(body)
+        paras = re.findall(r'<p>(.*?)</p>', body_)
+        for p in paras[:len(paras) - 1]:
+            p = ab_char_sub(p)
+            content.append(p)
+        return content
+
+    def write_time(self):
+        time_ = self.soup.find_all('time')[0]
+        str_time = str(time_)
+        # print(str_time)
+        str_time = ab_char_sub(str_time)
+        str_time = re.sub(r'[\t|\n|\.|,]', ' ', str_time)
+
+        # print(str_time)
+        try:
+            data_time = re.findall(r'Updated\s(.*?\d{4})', str_time)[0]
+            t = data_time.split()
+            a, m, d = t[2], t[0], t[1]
+
+            data_time = str(dateutil.parser.parse(a + '.' + m + '.' + d))
+            data_time = re.findall(r'(\d{4}.*?)\s', data_time)[0]
+        except Exception:
+            data_time = ''
+        return data_time
+
+
 def parser_choser(type, soup):
     if type == 'articles':
         parser = ArticleParser(soup)
     elif type == 'livecoverage':
         parser = LivecoverageParser(soup)
+    elif type == 'amp':
+        parser = AMPParser(soup)
     else:
         parser = None
     return parser
 
 
 if __name__ == '__main__':
-    driver = Driver(driver_path=lib.driver_path, extension_path=lib.ex_path).blank_driver()
-    driver.get(
-        'https://www.wsj.com/articles/the-disney-executive-who-made-119-505-a-day-11674045194?mod=hp_lead_pos9')
-    lib.js_activator(driver)
-    ps = driver.page_source
+    # driver = Driver(driver_path=lib.driver_path, extension_path=lib.ex_path).blank_driver()
+    url = 'https://www.wsj.com/amp/articles/feds-bullard-sees-need-to-keep-up-rapid-pace-of-rate-increases-11674058442?mod=markets_lead_pos9'
+    # driver.get(url)
+    # lib.js_activator(driver)
+    # ps = driver.page_source
     # with open('6.html', 'w', encoding='utf-8') as f:
     #     f.write(ps)
 
-    # with open('6.html', 'r', encoding='utf-8') as f:
-    #     soup = BeautifulSoup(f, 'html.parser')
-    # content(soup)
-    # parser = ArticleParser(soup)
-    # print(parser.title())
-    # print(parser.brief())
-    # print(parser.write_time())
-    # parser.content()
-    # sep_print(parser.content())
-
-    soup = BeautifulSoup(ps, 'html.parser')
-    parser = ArticleParser(soup)
-    sep_print(parser.content())
+    with open('6.html', 'r', encoding='utf-8') as f:
+        soup = BeautifulSoup(f, 'html.parser')
+        parser = parser_choser(lib.essay_type(url), soup)
+        print(parser.title())
+        print(parser.brief())
+        print(parser.write_time())
+        # parser.content()
+        # sep_print(parser.content())
