@@ -58,7 +58,7 @@ class ArticleParser(object):
             #         content.append(para_content[0])
             content.append(a)
 
-        return content
+        return ' '.join(content)
 
     def title(self):
         title_ = self.soup.find_all('title')[0]
@@ -107,7 +107,7 @@ class LivecoverageParser(ArticleParser):
             p = ab_char_sub(p)
             content.append(p)
 
-        return content
+        return ' '.join(content)
 
     def write_time(self):
         return ''
@@ -135,7 +135,7 @@ class AMPParser(ArticleParser):
         for p in paras[:len(paras) - 1]:
             p = ab_char_sub(p)
             content.append(p)
-        return content
+        return ' '.join(content)
 
     def write_time(self):
         time_ = self.soup.find_all('time')[0]
@@ -167,6 +167,34 @@ def parser_choser(type, soup):
     else:
         parser = None
     return parser
+
+class GooseParser(object):
+    def __init__(self, page_source):
+        from goose3 import Goose
+        self.g = Goose()
+        self.article = self.g.extract(raw_html=page_source)
+
+    def content(self):
+        a = self.article.cleaned_text
+        b = a.split()
+        a = ' '.join(b)
+        a = ab_char_sub(a)
+        return a
+
+    def brief(self):
+        return self.article.meta_description
+
+    def title(self):
+        return self.article.title
+
+    def write_time(self):
+        from dateutil.parser import parse
+        wt = self.article.publish_date.replace("\n", '')
+        wt = re.sub(r'ET(.*)', '', wt)
+        wt = re.sub(r'.*Updated\s', '', wt)
+        write_time = parse(wt).date()
+        return write_time
+
 
 
 if __name__ == '__main__':

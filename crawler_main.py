@@ -15,21 +15,24 @@ from namer import Namer
 from source_crawler import Crawler
 from hrefs2csv import Extractor
 from threading import Thread
+from multiprocessing import Process
+
 
 def main():
     hc = Href_Collecter()
     namer = Namer()
+
+    print(namer.Y + namer.M + namer.D)
 
     # 网络检查
     lib.net_check()
 
     # 爬取封面
     crawler = Crawler()
-    th_cover, th_market = Thread(target=crawler.cover), Thread(target=crawler.market)
+    th_cover, th_market = Process(target=crawler.cover), Process(target=crawler.market)
 
     th_cover.start(), th_market.start()
     th_cover.join(), th_market.join()
-
 
     # 分条爬取
     ex = Extractor()

@@ -72,8 +72,8 @@ class Driver(object):
 if __name__ == '__main__':
     driver = Driver(extension_path=ex_path).blank_driver()
     # driver.get('https://browserleaks.com/ip')
-    driver.get('https://www.wsj.com/articles/the-disney-executive-who-made-119-505-a-day-11674045194?mod=hp_lead_pos9')
-
+    driver.get('https://www.wsj.com/articles/feds-bullard-sees-need-to-keep-up-rapid-pace-of-rate-increases-11674058442?mod=markets_lead_pos9')
+    print(driver.current_url)
 #     # driver.get('http://httpbin.org/ip')
 #     # driver.get('http://www.google.com')
 #     print(driver.page_source)

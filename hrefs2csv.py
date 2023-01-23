@@ -10,63 +10,88 @@
 import pandas as pd
 from href_collector import Href_Collecter
 from driver_init import Driver
-from Parser import ArticleParser, LivecoverageParser, parser_choser
+from Parser import ArticleParser, LivecoverageParser, parser_choser, GooseParser
 from lib import *
 from wsj_selenium_crawler import lib
 from namer import Namer
 from bs4 import BeautifulSoup
 from threading import Thread
+from multiprocessing import Process
+from pathos.multiprocessing import Pool
 
 
 def list2df(href_list, df, retry=3):
-    # want to try the muti-thread
-    def func(i, df=df, ):
+    # want to try the muti-process
+    series_lst = []
+
+    def func(i, ):
         print('progress: {} of {}'.format(i + 1, len(href_list)), end='\t')
         print(href_list[i])
-        driver = Driver(extension_path=ex_path).blank_driver(mute=True)
-        driver.minimize_window()
 
-        driver.get(href_list[i])
-        js_activator(driver)
         for r in range(retry):
+            driver = Driver(extension_path=ex_path).blank_driver(mute=True)
+            driver.minimize_window()
+
+            driver.get(href_list[i])
             time.sleep(2)
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            js_activator(driver, thread_n=i + 1)
+
+            # time.sleep(10 * (retry + 1))
+            # pure_scroll(driver)
+            # soup = BeautifulSoup(driver.page_source, 'html.parser')
 
             # with open('1.html', 'w+', encoding='utf-8') as f:
             #     f.write(driver.page_source)
 
-            parser = parser_choser(essay_type(driver.current_url), soup)
+            parser = GooseParser(driver.page_source)
+            # time is actually not so important
             try:
-                title, brief, write_time, content, href = parser.title(), parser.brief(), parser.write_time(), parser.content(), \
-                                                          href_list[i]
-                df.loc[i] = [write_time, title, brief, content, href]
-                # print('Thread {} strange article form'.format(i+1))
-                break
-
+                write_time = parser.write_time()
             except Exception:
+                print('Thread {} write_time lost'.format(i + 1))
+                write_time = ''
+
+            try:
+                title, brief, content, href = parser.title(), parser.brief(), parser.content(), \
+                                              href_list[i]
+                assert content
+                df.loc[i] = [write_time, title, brief, content, href]
+                print('Process {} success with retry: {}'.format(i + 1, r))
+                # print(cover_df.loc[i])
+                driver.quit()
+
+                break
+            except Exception:
+                time.sleep(3)
                 if r < retry - 1:
+                    driver.quit()
                     continue
-                print('Thread {} strange article form'.format(i+1))
+                print('Retry{}, Process {} strange article form'.format(r + 1, i + 1))
                 title, brief, write_time, content, href = '', '', '', '', \
                                                           href_list[i]
                 df.loc[i] = [write_time, title, brief, content, href]
-        driver.quit()
+                driver.quit()
 
-        print("Thread {} done".format((i+1)))
+        print("Process {} done".format((i + 1)))
         # sep_print(content)
 
         time.sleep(0.5)
+        return df.loc[i]
 
+    p = Pool()
+    for i in range(len(href_list)):
+        # for i in range(2):
+        s = p.apply_async(func, args=(i,))
+        series_lst.append(s)
 
-    thread_lst = [Thread(target=func, args=(i, )) for i in range(len(href_list))]
-    # thread_lst = [Thread(target=func, args=(i, )) for i in range(2)]
-    for thread in thread_lst:
-        thread.start()
-    for thread in thread_lst:
-        thread.join()
+    p.close()
+    p.join()
+
+    print('sub process done')
+    # print([i.get() for i in series_lst], '\n')
     # 先等进程结束， 不然会提前返回
-    # print(df)
-    return df
+    df_ = pd.DataFrame([i.get() for i in series_lst])
+    return df_
 
 
 class Extractor(object):
@@ -102,8 +127,6 @@ class Extractor(object):
             name = self.namer.market_name(f_type='csv')
         df.to_csv(name, sep=',', index=True, header=True)
         return True
-
-
 
 
 if __name__ == '__main__':

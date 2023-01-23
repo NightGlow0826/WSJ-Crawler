@@ -7,20 +7,26 @@
 @Time    : 2023/1/8 12:11
 """
 import re
-
 import pandas as pd
-from namer import Namer
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_row', None)
-pd.set_option('max_colwidth', 500)
 
-# with open('source/cover/2023_1_11_cover.csv', 'r', encoding='utf-8') as f:
-#     a = f.read()
-#     print(a)
-namer = Namer()
-df = pd.read_csv(namer.cover_name(f_type='csv'), header=0, index_col=0)
-# print(df)
+df1 = pd.DataFrame({
+            "write_time": [],
+            "title": [],
+            "brief": [],
+            "content": [],
+            "href": []
+        })
 
-# df['title'] = df.title.map(lambda x: re.sub('- WSJ', '', x))
+df2 = pd.DataFrame({
+            "write_time": [],
+            "title": [],
+            "brief": [],
+            "content": [],
+            "href": []
+        })
+df1.loc[1] = 1, 2, 3, 4, 5
+df2.loc[2] = 6, 7, 8, 9, 0
+df3 = pd.DataFrame([df1.loc[1], df2.loc[2]])
+print(df3)
 
-print(df)
+
