@@ -12,8 +12,8 @@ from href_collector import Href_Collecter
 from driver_init import Driver
 from Parser import ArticleParser, LivecoverageParser, parser_choser, GooseParser
 from lib import *
-from wsj_selenium_crawler import lib
 from namer import Namer
+import lib
 from bs4 import BeautifulSoup
 from threading import Thread
 from multiprocessing import Process
@@ -55,13 +55,17 @@ def list2df(href_list, df, retry=3):
                 title, brief, content, href = parser.title(), parser.brief(), parser.content(), \
                                               href_list[i]
                 assert content
+                assert brief
+
                 df.loc[i] = [write_time, title, brief, content, href]
+
                 print('Process {} success with retry: {}'.format(i + 1, r))
                 # print(cover_df.loc[i])
                 driver.quit()
 
                 break
             except Exception:
+                print('Process {} failed this time, retry {}'.format(i+1, r))
                 time.sleep(3)
                 if r < retry - 1:
                     driver.quit()
@@ -78,7 +82,7 @@ def list2df(href_list, df, retry=3):
         time.sleep(0.5)
         return df.loc[i]
 
-    p = Pool()
+    p = Pool(4)
     for i in range(len(href_list)):
         # for i in range(2):
         s = p.apply_async(func, args=(i,))
@@ -134,6 +138,6 @@ if __name__ == '__main__':
     lib.net_check()
     namer = Namer()
     ex = Extractor()
-    # ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
-    ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
+    ex.cover(href_list=hc.lead_pos_href_list(namer.cover_name()))
+    # ex.market(href_list=hc.lead_pos_href_list(namer.market_name()))
     # ex.quit()
